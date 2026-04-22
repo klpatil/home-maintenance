@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Midwest Home Maintenance Tracker</title>
+  <meta name="description" content="A simple month-by-month home maintenance checklist for Midwest homeowners. Track seasonal tasks, add your own, never miss a tune-up." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%8F%A1%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Google Analytics (GA4) — replace G-XXXXXXXXXX with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" role="button" tabindex="0" id="brand-home">
+        <span class="brand-icon" aria-hidden="true">&#127969;</span>
+        <div class="brand-text">
+          <h1>Home Maintenance</h1>
+          <p class="brand-sub">homeowner tracker</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+        <button class="nav-btn" data-view="months">All Months</button>
+        <button class="nav-btn" id="btn-add-task">+ Add Task</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view">
+      <div class="hero">
+        <div>
+          <p class="eyebrow" id="hero-eyebrow">This month</p>
+          <h2 id="hero-month">—</h2>
+          <p class="hero-sub" id="hero-sub">Loading your maintenance tasks…</p>
+        </div>
+        <div class="hero-stats" id="hero-stats">
+          <!-- populated by app.js -->
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <section class="card">
+          <div class="card-head">
+            <h3>Open this month</h3>
+            <button class="link-btn" data-goto-month="current">View all &rarr;</button>
+          </div>
+          <ul class="task-list" id="dash-open-tasks">
+            <!-- populated by app.js -->
+          </ul>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Overdue</h3>
+            <span class="pill pill-danger" id="overdue-count">0</span>
+          </div>
+          <ul class="task-list" id="dash-overdue-tasks">
+            <!-- populated by app.js -->
+          </ul>
+        </section>
+      </div>
+
+      <section class="card">
+        <div class="card-head">
+          <h3>Year at a glance</h3>
+          <p class="muted">Click any month to drill down</p>
+        </div>
+        <div class="year-grid" id="year-grid"></div>
+      </section>
+
+      <section class="feedback-promo" role="button" tabindex="0" id="feedback-promo">
+        <div class="feedback-promo-icon" aria-hidden="true">&#128161;</div>
+        <div class="feedback-promo-body">
+          <h3>Help shape what's next &mdash; this app stays free</h3>
+          <p>Tell me which features would be worth paying for (reminders, sync, climate tuning, etc.). Takes 30 seconds.</p>
+        </div>
+        <button class="btn btn-primary" id="feedback-promo-btn" type="button">Share feedback</button>
+      </section>
+    </section>
+
+    <!-- MONTHS VIEW -->
+    <section id="view-months" class="view hidden">
+      <div class="month-header">
+        <div class="month-nav">
+          <button class="icon-btn" id="prev-month" aria-label="Previous month">&larr;</button>
+          <h2 id="month-title">Month</h2>
+          <button class="icon-btn" id="next-month" aria-label="Next month">&rarr;</button>
+        </div>
+        <div class="filters">
+          <select id="filter-category" class="select">
+            <option value="">All categories</option>
+          </select>
+          <select id="filter-status" class="select">
+            <option value="all">All tasks</option>
+            <option value="open">Open only</option>
+            <option value="completed">Completed only</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <ul class="task-list detailed" id="month-task-list">
+          <!-- populated by app.js -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- TASK DETAIL PANEL (drilldown) -->
+    <div id="task-detail" class="drawer hidden" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <div class="drawer-backdrop" data-close-detail></div>
+      <div class="drawer-panel">
+        <button class="close-btn" data-close-detail aria-label="Close">&times;</button>
+        <span class="badge" id="detail-category">Category</span>
+        <h2 id="detail-title">Task title</h2>
+        <p class="muted" id="detail-month">—</p>
+        <p id="detail-description"></p>
+        <div class="detail-meta">
+          <div class="meta-row"><span class="meta-label">Priority</span><span id="detail-priority"></span></div>
+          <div class="meta-row"><span class="meta-label">Estimated time</span><span id="detail-time"></span></div>
+          <div class="meta-row"><span class="meta-label">Deadline</span>
+            <input type="date" id="detail-deadline" class="date-input" />
+          </div>
+          <div class="meta-row"><span class="meta-label">Notes</span>
+            <textarea id="detail-notes" class="textarea" rows="3" placeholder="Add a note (e.g., which filter size, who serviced it)…"></textarea>
+          </div>
+        </div>
+        <div class="drawer-actions">
+          <button class="btn btn-primary" id="detail-toggle-complete">Mark complete</button>
+          <button class="btn btn-ghost hidden" id="detail-delete">Delete task</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK MODAL -->
+    <div id="feedback-modal" class="drawer hidden" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+      <div class="drawer-backdrop" data-close-feedback></div>
+      <div class="drawer-panel">
+        <button class="close-btn" data-close-feedback aria-label="Close">&times;</button>
+        <span class="badge">Future ideas</span>
+        <h2 id="feedback-title">Which features would you pay for?</h2>
+        <p class="muted">The core app is &mdash; and will stay &mdash; free. I'm only building paid features if enough people actually want them. Check any that would be worth real money to you.</p>
+
+        <form id="feedback-form" class="form">
+          <fieldset class="feature-checklist" id="feature-checklist">
+            <!-- populated by app.js -->
+          </fieldset>
+
+          <label>How much would Pro be worth to you per month?
+            <select name="price" id="feedback-price">
+              <option value="free_only">I only want the free version</option>
+              <option value="under_3">Under $3 / month</option>
+              <option value="3_to_7" selected>$3&ndash;7 / month</option>
+              <option value="7_to_15">$7&ndash;15 / month</option>
+              <option value="15_plus">$15+ / month</option>
+              <option value="one_time">I'd rather pay once than subscribe</option>
+            </select>
+          </label>
+
+          <label>Anything else? (optional)
+            <textarea name="comment" rows="3" maxlength="500" placeholder="A feature I'm missing, a problem I'm trying to solve, what I use today&hellip;"></textarea>
+          </label>
+
+          <label>Email &mdash; only if you want me to follow up (optional)
+            <input type="email" name="email" maxlength="120" placeholder="you@example.com" />
+          </label>
+
+          <div class="drawer-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-ghost" data-close-feedback>Cancel</button>
+          </div>
+        </form>
+
+        <div id="feedback-thanks" class="feedback-thanks hidden">
+          <div class="feedback-thanks-icon" aria-hidden="true">&#127881;</div>
+          <h3>Thanks &mdash; this really helps.</h3>
+          <p class="muted">I review feedback weekly and prioritize based on what people actually want to pay for. If you left an email, I'll follow up when there's progress.</p>
+          <button class="btn btn-primary" data-close-feedback type="button">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD TASK MODAL -->
+    <div id="add-task-modal" class="drawer hidden" role="dialog" aria-modal="true" aria-labelledby="add-title">
+      <div class="drawer-backdrop" data-close-add></div>
+      <div class="drawer-panel">
+        <button class="close-btn" data-close-add aria-label="Close">&times;</button>
+        <h2 id="add-title">Add a custom task</h2>
+        <p class="muted">Your task will be saved in this browser only.</p>
+        <form id="add-task-form" class="form">
+          <label>Title
+            <input type="text" name="title" required maxlength="80" placeholder="e.g., Clean radon mitigation fan" />
+          </label>
+          <label>Description
+            <textarea name="description" rows="3" maxlength="500" placeholder="Optional details…"></textarea>
+          </label>
+          <div class="row-2">
+            <label>Month
+              <select name="month" required id="add-month"></select>
+            </label>
+            <label>Category
+              <select name="category" required id="add-category"></select>
+            </label>
+          </div>
+          <div class="row-2">
+            <label>Priority
+              <select name="priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+            <label>Estimated time (min)
+              <input type="number" name="estTimeMin" min="1" max="600" value="30" />
+            </label>
+          </div>
+          <div class="drawer-actions">
+            <button type="submit" class="btn btn-primary">Add task</button>
+            <button type="button" class="btn btn-ghost" data-close-add>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      Data stays in your browser.
+      <button class="link-btn" id="reset-defaults">Reset to defaults</button>
+      &nbsp;&middot;&nbsp;
+      <button class="link-btn" id="feedback-footer-btn">Suggest a feature</button>
+    </p>
+  </footer>
+
+  <script src="tasks-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
